@@ -1,0 +1,10 @@
+{
+  "name": "super-mario-mates",
+  "version": "1.0.0",
+  "description": "Juego educativo estilo Super Mario por turnos para 2 jugadores (6 y 12 años) en español",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "MIT"
+}
