@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Super Mario Mates · Juego para 2 Hermanos</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- =======================================================
+       1. PANTALLA DE SELECCIÓN DE JUGADORES Y TEMARIO
+       ======================================================= -->
+  <main id="setup-screen" class="screen-card">
+    <header class="hero-banner">
+      <div class="logo-pill">🍄 SUPER MARIO MATES ⭐</div>
+      <p id="setup-hero-sub" class="hero-sub">
+        ¡Si aciertas en ≤30 s sigues jugando! Mueres si te choca un enemigo, caes a un foso o fallas un reto matemático.
+      </p>
+      <div class="mode-selector" role="group" aria-label="Número de jugadores">
+        <button id="btn-mode-1p" type="button" class="mode-btn">👤 1 Jugador</button>
+        <button id="btn-mode-2p" type="button" class="mode-btn active">👥 2 Jugadores (Por turnos)</button>
+      </div>
+    </header>
+
+    <section id="players-grid" class="players-grid">
+      <!-- JUGADOR 1 (Por defecto configurado para 12 años) -->
+      <div class="player-setup-box p1-box">
+        <div class="setup-box-header">
+          <h2>🎮 Jugador 1</h2>
+          <input id="p0-name" class="name-input" type="text" value="Jugador 1" maxlength="18" placeholder="Nombre..." />
+        </div>
+
+        <span class="section-label">Elige tu personaje:</span>
+        <div id="p0-chars" class="char-grid"></div>
+
+        <span class="section-label">Nivel de Matemáticas:</span>
+        <div class="age-tabs">
+          <label class="age-tab">
+            <input type="radio" name="p0-age" value="12" checked />
+            <span>📐 12 Años (M.C.D., m.c.m., Fracciones)</span>
+          </label>
+          <label class="age-tab">
+            <input type="radio" name="p0-age" value="6" />
+            <span>🔢 6 Años (Sumas y Restas)</span>
+          </label>
+        </div>
+
+        <div id="p0-topics-12" class="topics-list">
+          <label class="topic-chip"><input type="checkbox" value="mcd" checked /> M.C.D.</label>
+          <label class="topic-chip"><input type="checkbox" value="mcm" checked /> m.c.m.</label>
+          <label class="topic-chip"><input type="checkbox" value="fracciones" checked /> Fracciones (+, −, ×, :)</label>
+        </div>
+
+        <div id="p0-topics-6" class="topics-list hidden">
+          <label class="topic-chip"><input type="checkbox" value="sumaLlevadas" checked /> Sumas con llevadas</label>
+          <label class="topic-chip"><input type="checkbox" value="restaSinLlevadas" checked /> Restas sin llevadas</label>
+        </div>
+      </div>
+
+      <!-- JUGADOR 2 (Por defecto configurado para 6 años) -->
+      <div id="p1-setup-box" class="player-setup-box p2-box">
+        <div class="setup-box-header">
+          <h2>🎮 Jugador 2</h2>
+          <input id="p1-name" class="name-input" type="text" value="Jugador 2" maxlength="18" placeholder="Nombre..." />
+        </div>
+
+        <span class="section-label">Elige tu personaje:</span>
+        <div id="p1-chars" class="char-grid"></div>
+
+        <span class="section-label">Nivel de Matemáticas:</span>
+        <div class="age-tabs">
+          <label class="age-tab">
+            <input type="radio" name="p1-age" value="6" checked />
+            <span>🔢 6 Años (Sumas y Restas)</span>
+          </label>
+          <label class="age-tab">
+            <input type="radio" name="p1-age" value="12" />
+            <span>📐 12 Años (M.C.D., m.c.m., Fracciones)</span>
+          </label>
+        </div>
+
+        <div id="p1-topics-6" class="topics-list">
+          <label class="topic-chip"><input type="checkbox" value="sumaLlevadas" checked /> Sumas con llevadas</label>
+          <label class="topic-chip"><input type="checkbox" value="restaSinLlevadas" checked /> Restas sin llevadas</label>
+        </div>
+
+        <div id="p1-topics-12" class="topics-list hidden">
+          <label class="topic-chip"><input type="checkbox" value="mcd" checked /> M.C.D.</label>
+          <label class="topic-chip"><input type="checkbox" value="mcm" checked /> m.c.m.</label>
+          <label class="topic-chip"><input type="checkbox" value="fracciones" checked /> Fracciones (+, −, ×, :)</label>
+        </div>
+      </div>
+    </section>
+
+    <footer class="setup-footer">
+      <div class="match-select-group">
+        <label for="total-worlds">🏁 Duración del Torneo:</label>
+        <select id="total-worlds">
+          <option value="1">1 Mundo · Carrera Rápida</option>
+          <option value="2" selected>2 Mundos · Copa Champiñón</option>
+          <option value="3">3 Mundos · Gran Torneo Estelar</option>
+        </select>
+      </div>
+
+      <div class="controls-hint">
+        ⌨️ Moverse: <strong>Flechas</strong> o <strong>A / D</strong> · Saltar: <strong>Espacio</strong> o <strong>↑</strong> · Test: <strong>Clic</strong> o teclas <strong>A, B, C, D / 1-4</strong>
+      </div>
+
+      <button id="btn-start-game" type="button" class="btn-primary">🍄 ¡EMPEZAR PARTIDA!</button>
+    </footer>
+  </main>
+
+  <!-- =======================================================
+       2. PANTALLA DE JUEGO PLATAFORMERO POR TURNOS
+       ======================================================= -->
+  <section id="game-screen" class="game-shell hidden">
+    <header class="top-hud">
+      <!-- Tarjeta Jugador 1 -->
+      <div id="hud-p0" class="hud-card active-player">
+        <canvas id="hud-avatar-0" width="48" height="48"></canvas>
+        <div class="hud-info">
+          <div class="hud-top-row">
+            <span id="hud-name-0" class="hud-name">Jugador 1</span>
+            <span id="hud-status-0" class="hud-turn-pill">▶ SU TURNO</span>
+          </div>
+          <div class="hud-metrics">
+            <span id="hud-score-0">0 pts</span>
+            <span id="hud-coins-0">🪙 0</span>
+            <span id="hud-streak-0">🔥 0</span>
+            <span id="hud-world-0">Mundo 1-1</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra Central de Carrera -->
+      <div class="hud-center">
+        <div class="hud-center-top">
+          <span id="hud-stage-title" class="stage-title">Mundo 1-1 · Pradera Champiñón</span>
+          <div class="hud-mini-btns">
+            <button id="btn-mute" type="button" class="btn-mini">🔊 Sonido</button>
+            <button id="btn-restart" type="button" class="btn-mini">🏠 Menú</button>
+          </div>
+        </div>
+        <div class="race-track-wrap">
+          <span>🏁</span>
+          <div class="race-track">
+            <div id="race-pin-0" class="race-pin" style="left: 0%;">M</div>
+            <div id="race-pin-1" class="race-pin" style="left: 0%;">Y</div>
+          </div>
+          <span>🏰</span>
+        </div>
+      </div>
+
+      <!-- Tarjeta Jugador 2 -->
+      <div id="hud-p1" class="hud-card">
+        <canvas id="hud-avatar-1" width="48" height="48"></canvas>
+        <div class="hud-info">
+          <div class="hud-top-row">
+            <span id="hud-name-1" class="hud-name">Jugador 2</span>
+            <span id="hud-status-1" class="hud-turn-pill">ESPERA</span>
+          </div>
+          <div class="hud-metrics">
+            <span id="hud-score-1">0 pts</span>
+            <span id="hud-coins-1">🪙 0</span>
+            <span id="hud-streak-1">🔥 0</span>
+            <span id="hud-world-1">Mundo 1-1</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="canvas-stage">
+      <canvas id="game-canvas" width="960" height="520"></canvas>
+
+      <!-- Cartel de aviso al cambiar el turno -->
+      <div id="turn-overlay" class="turn-overlay">
+        <div class="turn-box">
+          <canvas id="turn-avatar" width="76" height="76"></canvas>
+          <h2 id="turn-title">¡Turno de Jugador 1!</h2>
+          <p id="turn-subtitle">Golpea bloques ? para ganar poderes o llega al castillo final.</p>
+          <button id="btn-begin-turn" type="button" class="btn-primary">¡Adelante! (Espacio / Enter)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controles en pantalla para ratón o tablet -->
+    <div class="touch-controls">
+      <div class="dpad-group">
+        <button id="btn-left" type="button" class="touch-btn">◀ Izquierda</button>
+        <button id="btn-right" type="button" class="touch-btn">Derecha ▶</button>
+      </div>
+      <button id="btn-jump" type="button" class="touch-btn jump-btn">⬆ SALTAR</button>
+    </div>
+  </section>
+
+  <!-- =======================================================
+       3. MODAL DE PROBLEMA DE MATEMÁTICAS (4 OPCIONES)
+       ======================================================= -->
+  <div id="math-modal" class="math-modal hidden" role="dialog" aria-modal="true">
+    <div class="math-dialog">
+      <div id="math-event-banner" class="math-event-banner banner-block">
+        🟨 ¡BLOQUE ? MATEMÁTICO!
+      </div>
+      <div class="math-body">
+        <div class="math-meta">
+          <span id="math-player-pill" class="player-pill">🍄 Jugador 1</span>
+          <span id="math-timer-pill" class="timer-pill">⏱️ 30 s</span>
+          <span id="math-topic-badge" class="topic-badge">M.C.D.</span>
+        </div>
+
+        <div class="math-timer-track" aria-label="Tiempo restante">
+          <div id="math-timer-fill" class="math-timer-fill"></div>
+        </div>
+
+        <h3 id="math-question-title" class="math-question-title">Resuelve el reto:</h3>
+        <div id="math-prompt" class="math-prompt-area"></div>
+
+        <div id="math-options" class="math-options-grid"></div>
+
+        <div id="math-feedback" class="math-feedback hidden">
+          <p id="math-result-title"></p>
+          <p id="math-explanation"></p>
+          <button id="btn-next-turn" type="button" class="btn-primary">
+            🔄 Pasar el turno ▶
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================
+       4. PANTALLA DE PODIO Y ESTADÍSTICAS FINALES
+       ======================================================= -->
+  <section id="victory-screen" class="screen-card hidden">
+    <header class="hero-banner">
+      <div class="logo-pill">🏆 FIN DEL TORNEO 🏆</div>
+      <h2 id="victory-headline" style="margin-top: 14px; font-size: 1.75rem;"></h2>
+      <p id="victory-sub" class="hero-sub"></p>
+    </header>
+
+    <div id="victory-cards" class="victory-cards-grid"></div>
+
+    <div class="victory-actions">
+      <button id="btn-play-again" type="button" class="btn-primary">🔄 ¡Jugar Revancha!</button>
+      <button id="btn-back-setup" type="button" class="btn-secondary">⚙️ Cambiar Personajes o Nivel</button>
+    </div>
+  </section>
+
+  <script src="js/audio.js"></script>
+  <script src="js/math.js"></script>
+  <script src="js/sprites.js"></script>
+  <script src="js/levels.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
